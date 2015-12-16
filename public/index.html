@@ -1,36 +1,39 @@
+<!DOCTYPE html>
 <html>
 <head>
    <!-- chat app based on https://www.firebase.com/tutorial/#example/chat
 	with added Math rendering via inclusion of the MathJax lib.
 	Created during the the Firebase Hackatlon Google-NYC Nov 7,8 2015
-	
+
 	 Filip Babalievsky
        -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <link rel="stylesheet" type="text/css" href="css/main.css">
   <script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
   <!-- MathJax inclusion -->
-  <script type="text/x-mathjax-config"><!-- the type attribute prevents js from trying to interpret it before mathjax is loaded -->
-      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
   </script>
   <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
 </head>
-<body>
+<body>  
 
 <!-- CHAT MARKUP -->
 <div class="example-chat l-demo-container">
-  <h3>Chat  MathJax - <a href="http://mathjax.org"target=_blank>MathJax</a> included to render formulas</h3>
-	<p> Surround (wrap) your 
-		<a href="http://www.latex-tutorial.com/tutorials/beginners/lesson-4/" target=_blank>TeX/LaTeX</a> 
-		with <b><code>\(</code></b> and <b><code>\)</code></b> for inline math
-		and with <span>\</span><span>[</span> and <span>\</span><span>]</span> 
-		for display math rendering 
-		(<span>$</span>...<span>$</span> for inline; <span>$$</span>....<span>$$</span> for display math would also work).
-	
-	<p> If you want just to show the command text do not wrap it. 
-		If you want to see the TeX/LaTeX for a rendered formula right-click on it.
+  <h3>Chat  MathJax - <a href="http://mathjax.org" target=_blank>MathJax</a> included to render formulas
+  
+  </h3>
 
+	<p> Surround (wrap) your
+		<a href="http://www.latex-tutorial.com/tutorials/beginners/lesson-4/" target=_blank>TeX/LaTeX</a>
+		with <b><code>\(</code></b> and <b><code>\)</code></b> for inline math
+		and with <span>\</span><span>[</span> and <span>\</span><span>]</span>
+		for display math
+		(<span>$</span>...<span>$</span> for inline; <span>$$</span>....<span>$$</span> for display math would also work).
+		If you want just to show the command text do not wrap it.
+		If you want to see the TeX/LaTeX for a rendered formula right-click on it.
   <div class='example-chat-toolbar'>
     <label for="nameInput">Username:</label>
     <input type='text' id='nameInput' placeholder='enter a username...'>
@@ -40,19 +43,23 @@
 
   <footer>
     <input type='text' id='messageInput'  placeholder='Type a message...'>
+	
   </footer>
 </div>
 
 <!-- CHAT JAVACRIPT -->
 <script>
   // CREATE A REFERENCE TO FIREBASE
-    // if replicationg please use your own firebase app
-	var messagesRef = new Firebase('https://your-firebaseapp-name-here.firebaseio.com/');
+    // if replicating please use your own firebase app
+	var messagesRef = new Firebase('https://your-firebaseapp-here.firebaseio.com/');
   // REGISTER DOM ELEMENTS
   var messageField = $('#messageInput');
   var nameField = $('#nameInput');
   var messageList = $('#example-messages');
-	var myLastMessage = '';
+  var myLastMessage = '';
+  
+  $("#toggle-help").on("click", function(){ $("#help-text").slideToggle(); } );
+  
   // LISTEN FOR KEYPRESS EVENT
   messageField.keypress(function (e) {
     //console.log("keyCode " + e.keyCode);
@@ -66,14 +73,14 @@
 	  myLastMessage = message;
       messageField.val('');
     }
-	
+
   });
   messageField.keydown(function (e) {
 	 if (e.keyCode == 38) {
 		 messageField.val(myLastMessage);
 	 }
   });
-  
+
 
   // Add a callback that is triggered for each chat message.
   messagesRef.limitToLast(100).on('child_added', function (snapshot) {
@@ -91,13 +98,12 @@
     //ADD MESSAGE
     messageList.append(messageElement)
 
+	// queue re-render w/ mathjax
+	MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 	// and then...
-    //SCROLL TO BOTTOM OF MESSAGE LIST
-    messageList[0].scrollTop = messageList[0].scrollHeight;
-	//re-render w/ mathjax
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-	// give some time to MathJax to render the math then calculate again
-	setTimeout(function(){messageList[0].scrollTop = messageList[0].scrollHeight;  }, 1500);
+	// queue SCROLL TO BOTTOM OF MESSAGE LIST
+	MathJax.Hub.Queue(function () { messageList[0].scrollTop = messageList[0].scrollHeight;});
+   
   });
 </script>
 </body>
